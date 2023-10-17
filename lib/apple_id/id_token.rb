@@ -3,7 +3,7 @@ module AppleID
     class VerificationFailed < Error; end
 
     attr_optional :email, :email_verified, :is_private_email, :nonce_supported, :real_user_status
-    attr_accessor :original_jwt_string
+    attr_accessor :original_jwt_string, :skip_exp_verification
     alias_method :original_jwt, :raw_attributes
 
     [:email_verified, :is_private_email, :nonce_supported].each do |boolean_claim|
@@ -91,7 +91,7 @@ module AppleID
       if Time.now.to_i < iat
         failure_reasons << :iat
       end
-      if Time.now.to_i >= exp
+      if skip_exp_verification && Time.now.to_i >= exp
         failure_reasons << :exp
       end
 
